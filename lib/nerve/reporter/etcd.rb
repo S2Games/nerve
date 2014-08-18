@@ -65,6 +65,8 @@ class Nerve::Reporter
         @etcd.delete(@full_key)
       rescue ::Etcd::KeyNotFound
       rescue Errno::ECONNREFUSED
+      ensure
+        @full_key = nil
       end
     end
 
@@ -76,7 +78,7 @@ class Nerve::Reporter
     def etcd_save
       return etcd_create unless @full_key
       begin
-        @etcd.set(@key, :value => @data, ttl => 30)
+        @etcd.set(@full_key, :value => @data, :ttl => 30)
       rescue ::Etcd::KeyNotFound
         etcd_create
       end
